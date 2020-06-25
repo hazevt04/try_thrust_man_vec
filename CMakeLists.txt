@@ -1,6 +1,5 @@
 cmake_minimum_required( VERSION 2.8.0 )
 
-
 project( try_thrust_man_vec LANGUAGES CXX CUDA )
 
 set(CMAKE_CXX_STANDARD 11)
@@ -15,14 +14,13 @@ cuda_select_nvcc_arch_flags(ARCH_FLAGS 3.0 7.2 6.1)
 
 list(APPEND CUDA_NVCC_FLAGS ${ARCH_FLAGS})
 list(APPEND CUDA_NVCC_FLAGS "--ptxas-options=-v")
-LIST(APPEND CUDA_NVCC_FLAGS "--use_fast_math")
+list(APPEND CUDA_NVCC_FLAGS "--use_fast_math")
 
 set(CUDA_VERBOSE_BUILD ON)
 
 set(EXEC_NAME "${CMAKE_PROJECT_NAME}")
 
 set(SRCS
-   "src/utils.cpp"
    "src/try_thrust_man_vec.cu"
    )
 
@@ -30,5 +28,5 @@ include_directories( "include" )
 
 cuda_add_executable( "${EXEC_NAME}" "${SRCS}" )
 target_link_libraries( "${EXEC_NAME}" m )
-
+cuda_add_cufft_to_target( "${EXEC_NAME}" )
 

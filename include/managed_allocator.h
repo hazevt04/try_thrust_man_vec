@@ -1,43 +1,41 @@
 #ifndef __MANAGED_ALLOCATOR_H__
 #define __MANAGED_ALLOCATOR_H__
 
-#include "utils.h"
-#include <cuda_runtime.h>
-
-#include <thrust/device_malloc_allocator.h>
-#include <thrust/device_vector.h>
+//#pragma once
 
 #include <thrust/system_error.h>
 #include <thrust/system/cuda/error.h>
 
-// CMFlag is one of:
-// cudaMemAttachGlobal
-// cudaMemAttachHost
-
-template<class T, unsigned int CMFlag>
-class managed_allocator : public thrust::device_malloc_allocator<T>
+template<class T>
+class managed_allocator
 {
   public:
     using value_type = T;
+    using reference = T&;
+    using const_reference = const T&;
 
-    typedef thrust::device_ptr<T>  pointer;
-    inline pointer allocate(size_t n)
+    managed_allocator() {}
+
+    template<class U>
+    managed_allocator(const managed_allocator<U>&) {}
+  
+    value_type* allocate(size_t n)
     {
       value_type* result = nullptr;
   
-      cudaError_t error = cudaMallocManaged(&result, n*sizeof(T), CMFlag);
+      cudaError_t error = cudaMallocManaged(&result, n*sizeof(T), cudaMemAttachGlobal);
   
       if(error != cudaSuccess)
       {
         throw thrust::system_error(error, thrust::cuda_category(), "managed_allocator::allocate(): cudaMallocManaged");
       }
   
-      return thrust::device_pointer_cast(result);
+      return result;
     }
   
-    inline void deallocate(pointer ptr, size_t)
+    void deallocate(value_type* ptr, size_t)
     {
-      cudaError_t error = cudaFree(thrust::raw_pointer_cast(ptr));
+      cudaError_t error = cudaFree(ptr);
   
       if(error != cudaSuccess)
       {
@@ -46,6 +44,16 @@ class managed_allocator : public thrust::device_malloc_allocator<T>
     }
 };
 
+template<class T1, class T2>
+bool operator==(const managed_allocator<T1>&, const managed_allocator<T2>&)
+{
+  return true;
+}
 
+template<class T1, class T2>
+bool operator!=(const managed_allocator<T1>& lhs, const managed_allocator<T2>& rhs)
+{
+  return !(lhs == rhs);
+}
 
 #endif // end of #ifndef __MANAGED_ALLOCATOR_H__
