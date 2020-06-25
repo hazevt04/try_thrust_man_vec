@@ -1,8 +1,12 @@
 #ifndef __MANAGED_ALLOCATOR_H__
 #define __MANAGED_ALLOCATOR_H__
 
-//#pragma once
+// Managed Allocator Class
+// Allows use of STL clases (like std::vector) with cudaMallocManaged() and cudaFree()
+// From Jared Hoberock, NVIDIA:
+// https://github.com/jaredhoberock/managed_allocator/blob/master/managed_allocator.hpp
 
+//#pragma once
 #include <thrust/system_error.h>
 #include <thrust/system/cuda/error.h>
 

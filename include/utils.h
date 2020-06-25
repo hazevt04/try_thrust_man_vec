@@ -121,14 +121,19 @@ void print_vec( const std::vector<T>& vals, const char* prefix = "" ) {
    std::cout << std::endl;
 }
 
-void printf_floats( float* const vals, const int num_vals );
-void printf_ints( int* const vals, const int num_vals );
-void printf_uints( unsigned int* const vals, const int num_vals );
-void printf_ulongs( unsigned long* const vals, const int num_vals );
-
 inline bool compare_floats( float* const read_vals, float* const write_vals, int num_vals ) {
    for( int index = 0; index < num_vals; index++ ) {
       if ( read_vals[index] != write_vals[index] ) {
+         return false;
+      }
+   }
+   return true;
+}
+
+template <class T>
+bool compare_vec( const std::vector<T>& l_vals, const std::vector<T>& r_vals ) {
+   for( size_t index = 0; index != l_vals.size(); ++index ) {
+      if ( l_vals[ index ] != r_vals[ index ] ) {
          return false;
       }
    }
